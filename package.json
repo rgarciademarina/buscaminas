@@ -3,10 +3,10 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "build": "react-router build",
-    "dev": "react-router dev",
-    "start": "react-router-serve ./build/server/index.js",
-    "typecheck": "react-router typegen && tsc",
+    "build": "vite build",
+    "dev": "vite",
+    "start": "vite preview",
+    "typecheck": "tsc",
     "build:static": "vite build --config vite.config.ts",
     "preview:static": "vite preview --config vite.config.ts",
     "dev:static": "vite --config vite.config.ts"

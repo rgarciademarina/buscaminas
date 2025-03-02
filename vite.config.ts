@@ -1,5 +1,4 @@
 import { defineConfig } from 'vite';
-import { reactRouter } from 'vite-plugin-react-router';
 import tailwindcss from '@tailwindcss/vite';
 import tsconfigPaths from 'vite-tsconfig-paths';
 import react from '@vitejs/plugin-react';
@@ -8,7 +7,7 @@ import react from '@vitejs/plugin-react';
 const isProduction = process.env.NODE_ENV === 'production';
 
 export default defineConfig({
-  plugins: [tailwindcss(), tsconfigPaths(), react(), reactRouter()],
+  plugins: [tailwindcss(), tsconfigPaths(), react()],
   base: isProduction ? '/buscaminas/' : '/', // Base path para GitHub Pages en producción, raíz en desarrollo
   build: {
     rollupOptions: {
