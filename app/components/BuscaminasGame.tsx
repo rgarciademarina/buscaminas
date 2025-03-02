@@ -40,6 +40,17 @@ export function BuscaminasGame() {
     expert: { rows: 16, cols: 30, mines: 99 }
   };
 
+  // Función para calcular el tamaño de celda según la dificultad
+  const getCellSize = () => {
+    if (difficulty === 'expert') {
+      return 22; // Tamaño más pequeño para el modo experto
+    } else if (difficulty === 'intermediate') {
+      return 28; // Tamaño medio para el modo intermedio
+    } else {
+      return 32; // Tamaño normal para el modo principiante
+    }
+  };
+
   // Función para inicializar el tablero
   const initializeBoard = React.useCallback(() => {
     const { rows, cols, mines } = levels[difficulty as keyof typeof levels];
@@ -213,10 +224,16 @@ export function BuscaminasGame() {
     }
   };
 
+  // Calcular el tamaño de celda actual
+  const cellSize = getCellSize();
+
   // Renderizar el tablero
   return (
     <div className="container">
-      <h1>Buscaminas</h1>
+      <div className="game-header">
+        <h1>Buscaminas</h1>
+        <div className="game-subtitle">¡Encuentra todas las casillas sin minas!</div>
+      </div>
       
       <div className="difficulty-buttons">
         {Object.keys(levels).map((level) => (
@@ -247,15 +264,18 @@ export function BuscaminasGame() {
       {/* Mensaje de fin de juego */}
       {(gameOver || win) && (
         <div className={`game-message ${win ? 'win' : 'lose'}`}>
-          {win ? '¡Felicidades! Has ganado!' : '¡Has perdido! Inténtalo de nuevo.'}
+          {win ? 
+            <><span className="message-icon">🎉</span> ¡Felicidades! Has ganado el juego</> : 
+            <><span className="message-icon">💥</span> ¡Has perdido! Inténtalo de nuevo</>
+          }
         </div>
       )}
       
       {/* Tablero de juego */}
       <div 
-        className="board"
+        className={`board difficulty-${difficulty}`}
         style={{ 
-          gridTemplateColumns: `repeat(${levels[difficulty as keyof typeof levels].cols}, 30px)`
+          gridTemplateColumns: `repeat(${levels[difficulty as keyof typeof levels].cols}, ${cellSize}px)`
         }}
       >
         {board.map((row, rowIdx) => 
@@ -263,6 +283,7 @@ export function BuscaminasGame() {
             <Cell 
               key={`${rowIdx}-${colIdx}`} 
               cell={cell} 
+              size={cellSize}
               onClick={() => revealCell(rowIdx, colIdx)}
               onContextMenu={(e) => {
                 e.preventDefault();
@@ -278,13 +299,13 @@ export function BuscaminasGame() {
       <div className="scores-container">
         {Object.entries(scores).map(([level, levelScores]) => (
           <div key={level} className="score-card">
-            <h3 className="capitalize">{level}</h3>
+            <h3>{level.charAt(0).toUpperCase() + level.slice(1)}</h3>
             {(levelScores as any[]).length > 0 ? (
               <ul className="score-list">
                 {(levelScores as any[]).map((score, idx) => (
                   <li key={idx} className="score-item">
                     <span>{score.date}</span>
-                    <span>{score.mines} minas</span>
+                    <span className="score-mines">{score.mines} minas</span>
                   </li>
                 ))}
               </ul>
@@ -294,12 +315,16 @@ export function BuscaminasGame() {
           </div>
         ))}
       </div>
+      
+      <footer className="game-footer">
+        <p>Desarrollado con ❤️ usando React</p>
+      </footer>
     </div>
   );
 }
 
 // Componente para una celda individual
-function Cell({ cell, onClick, onContextMenu }: { cell: any, onClick: () => void, onContextMenu: (e: React.MouseEvent) => void }) {
+function Cell({ cell, size, onClick, onContextMenu }: { cell: any, size: number, onClick: () => void, onContextMenu: (e: React.MouseEvent) => void }) {
   // Determinar el contenido y estilo de la celda
   let content = '';
   let className = 'cell';
@@ -323,6 +348,7 @@ function Cell({ cell, onClick, onContextMenu }: { cell: any, onClick: () => void
       onClick={onClick}
       onContextMenu={onContextMenu}
       className={className}
+      style={{ width: `${size}px`, height: `${size}px`, fontSize: `${size * 0.6}px` }}
     >
       {content}
     </button>
