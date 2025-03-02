@@ -215,96 +215,84 @@ export function BuscaminasGame() {
 
   // Renderizar el tablero
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100 dark:bg-gray-900 p-4">
-      <h1 className="text-4xl font-bold text-center mb-8 text-gray-800 dark:text-white">Buscaminas</h1>
-      <div className="w-full max-w-3xl">
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
-          <div className="flex justify-between items-center mb-6">
-            <div className="flex space-x-4">
-              {Object.keys(levels).map((level) => (
-                <button
-                  key={level}
-                  onClick={() => setDifficulty(level)}
-                  className={`px-4 py-2 rounded-md font-medium transition-colors ${
-                    difficulty === level
-                      ? 'bg-blue-500 text-white'
-                      : 'bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 hover:bg-gray-300 dark:hover:bg-gray-600'
-                  }`}
-                >
-                  {level.charAt(0).toUpperCase() + level.slice(1)}
-                </button>
-              ))}
-            </div>
-            
-            <div className="flex items-center gap-4">
-              <div className="flex items-center bg-gray-200 dark:bg-gray-700 px-3 py-1 rounded-md">
-                <span className="text-red-500 mr-2">🚩</span>
-                <span className="font-medium">{flagCount} / {levels[difficulty as keyof typeof levels].mines}</span>
-              </div>
-              
-              <button
-                onClick={initializeBoard}
-                className="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-md transition-colors"
-              >
-                Nuevo Juego
-              </button>
-            </div>
-          </div>
-          
-          {/* Mensaje de fin de juego */}
-          {(gameOver || win) && (
-            <div className={`mb-4 p-3 rounded text-center ${win ? 'bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200' : 'bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-200'}`}>
-              {win ? '¡Felicidades! Has ganado!' : '¡Has perdido! Inténtalo de nuevo.'}
-            </div>
-          )}
-          
-          {/* Tablero de juego */}
-          <div 
-            className="grid gap-1 mx-auto"
-            style={{ 
-              gridTemplateColumns: `repeat(${levels[difficulty as keyof typeof levels].cols}, minmax(0, 1fr))`,
-              width: 'fit-content'
-            }}
+    <div className="container">
+      <h1>Buscaminas</h1>
+      
+      <div className="difficulty-buttons">
+        {Object.keys(levels).map((level) => (
+          <button
+            key={level}
+            onClick={() => setDifficulty(level)}
+            className={`difficulty-button ${difficulty === level ? 'active' : ''}`}
           >
-            {board.map((row, rowIdx) => 
-              row.map((cell, colIdx) => (
-                <Cell 
-                  key={`${rowIdx}-${colIdx}`} 
-                  cell={cell} 
-                  onClick={() => revealCell(rowIdx, colIdx)}
-                  onContextMenu={(e) => {
-                    e.preventDefault();
-                    toggleFlag(rowIdx, colIdx);
-                  }}
-                />
-              ))
+            {level.charAt(0).toUpperCase() + level.slice(1)}
+          </button>
+        ))}
+      </div>
+      
+      <div className="game-controls">
+        <div className="flag-counter">
+          <span className="flag">🚩</span>
+          <span>{flagCount} / {levels[difficulty as keyof typeof levels].mines}</span>
+        </div>
+        
+        <button
+          onClick={initializeBoard}
+          className="new-game-button"
+        >
+          Nuevo Juego
+        </button>
+      </div>
+      
+      {/* Mensaje de fin de juego */}
+      {(gameOver || win) && (
+        <div className={`game-message ${win ? 'win' : 'lose'}`}>
+          {win ? '¡Felicidades! Has ganado!' : '¡Has perdido! Inténtalo de nuevo.'}
+        </div>
+      )}
+      
+      {/* Tablero de juego */}
+      <div 
+        className="board"
+        style={{ 
+          gridTemplateColumns: `repeat(${levels[difficulty as keyof typeof levels].cols}, 30px)`
+        }}
+      >
+        {board.map((row, rowIdx) => 
+          row.map((cell, colIdx) => (
+            <Cell 
+              key={`${rowIdx}-${colIdx}`} 
+              cell={cell} 
+              onClick={() => revealCell(rowIdx, colIdx)}
+              onContextMenu={(e) => {
+                e.preventDefault();
+                toggleFlag(rowIdx, colIdx);
+              }}
+            />
+          ))
+        )}
+      </div>
+      
+      {/* Sección de puntuaciones */}
+      <h2>Mejores Puntuaciones</h2>
+      <div className="scores-container">
+        {Object.entries(scores).map(([level, levelScores]) => (
+          <div key={level} className="score-card">
+            <h3 className="capitalize">{level}</h3>
+            {(levelScores as any[]).length > 0 ? (
+              <ul className="score-list">
+                {(levelScores as any[]).map((score, idx) => (
+                  <li key={idx} className="score-item">
+                    <span>{score.date}</span>
+                    <span>{score.mines} minas</span>
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <p className="no-scores">Sin puntuaciones</p>
             )}
           </div>
-          
-          {/* Sección de puntuaciones */}
-          <div className="mt-8">
-            <h2 className="text-xl font-bold mb-4 text-gray-800 dark:text-white">Mejores Puntuaciones</h2>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              {Object.entries(scores).map(([level, levelScores]) => (
-                <div key={level} className="bg-gray-100 dark:bg-gray-700 p-4 rounded-md">
-                  <h3 className="text-lg font-semibold mb-2 capitalize">{level}</h3>
-                  {levelScores.length > 0 ? (
-                    <ul className="space-y-2">
-                      {(levelScores as any[]).map((score, idx) => (
-                        <li key={idx} className="flex justify-between">
-                          <span>{score.date}</span>
-                          <span className="font-medium">{score.mines} minas</span>
-                        </li>
-                      ))}
-                    </ul>
-                  ) : (
-                    <p className="text-gray-500 dark:text-gray-400">Sin puntuaciones</p>
-                  )}
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
+        ))}
       </div>
     </div>
   );
@@ -314,38 +302,19 @@ export function BuscaminasGame() {
 function Cell({ cell, onClick, onContextMenu }: { cell: any, onClick: () => void, onContextMenu: (e: React.MouseEvent) => void }) {
   // Determinar el contenido y estilo de la celda
   let content = '';
-  let bgColor = 'bg-gray-300 dark:bg-gray-600';
-  let textColor = 'text-gray-800 dark:text-white';
+  let className = 'cell';
   
   if (cell.isFlagged) {
     content = '🚩';
   } else if (cell.isRevealed) {
     if (cell.isMine) {
       content = '💣';
-      bgColor = 'bg-red-500';
+      className += ' mine';
     } else if (cell.neighbors > 0) {
       content = cell.neighbors.toString();
-      
-      // Colores para los diferentes números
-      const colors = [
-        '', // No se usa el índice 0
-        'text-blue-600 dark:text-blue-400',
-        'text-green-600 dark:text-green-400',
-        'text-red-600 dark:text-red-400',
-        'text-purple-600 dark:text-purple-400',
-        'text-yellow-600 dark:text-yellow-400',
-        'text-pink-600 dark:text-pink-400',
-        'text-indigo-600 dark:text-indigo-400',
-        'text-gray-600 dark:text-gray-400'
-      ];
-      
-      if (cell.neighbors <= 8) {
-        textColor = colors[cell.neighbors];
-      }
-      
-      bgColor = 'bg-gray-200 dark:bg-gray-700';
+      className += ` revealed number-${cell.neighbors}`;
     } else {
-      bgColor = 'bg-gray-200 dark:bg-gray-700';
+      className += ' revealed';
     }
   }
   
@@ -353,7 +322,7 @@ function Cell({ cell, onClick, onContextMenu }: { cell: any, onClick: () => void
     <button
       onClick={onClick}
       onContextMenu={onContextMenu}
-      className={`w-8 h-8 flex items-center justify-center border border-gray-400 dark:border-gray-700 ${bgColor} ${textColor} font-bold text-sm ${!cell.isRevealed && 'hover:bg-gray-400 dark:hover:bg-gray-500'} transition-colors duration-200`}
+      className={className}
     >
       {content}
     </button>
