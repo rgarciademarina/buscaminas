@@ -6,7 +6,10 @@
     "build": "react-router build",
     "dev": "react-router dev",
     "start": "react-router-serve ./build/server/index.js",
-    "typecheck": "react-router typegen && tsc"
+    "typecheck": "react-router typegen && tsc",
+    "build:static": "vite build --config vite.config.ts",
+    "preview:static": "vite preview --config vite.config.ts",
+    "dev:static": "vite --config vite.config.ts"
   },
   "dependencies": {
     "@react-router/node": "^7.2.0",
@@ -22,6 +25,7 @@
     "@types/node": "^20",
     "@types/react": "^19.0.1",
     "@types/react-dom": "^19.0.1",
+    "@vitejs/plugin-react": "^4.2.1",
     "autoprefixer": "^10.4.20",
     "postcss": "^8.5.3",
     "react-router-devtools": "^1.1.0",
