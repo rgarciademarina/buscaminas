@@ -30,26 +30,21 @@ jobs:
       - name: Install dependencies
         run: npm ci
       
-      - name: Build
-        run: npm run build
-      
-      - name: Create index.html
+      - name: Build static version
         run: |
-          cat > build/client/index.html << 'EOL'
-          <!DOCTYPE html>
-          <html lang="es">
-          <head>
-            <meta charset="UTF-8">
-            <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <title>Buscaminas</title>
-            <link rel="stylesheet" href="./assets/root-7xEKjomX.css">
-            <script type="module" src="./assets/entry.client-DMDbIu5M.js"></script>
-          </head>
-          <body>
-            <div id="root"></div>
-          </body>
-          </html>
-          EOL
+          # Crear un script de construcción estática
+          echo '{
+            "scripts": {
+              "build:static": "vite build --config vite.config.ts"
+            }
+          }' > temp-package.json
+          
+          # Fusionar con el package.json existente
+          jq -s '.[0] * .[1]' package.json temp-package.json > new-package.json
+          mv new-package.json package.json
+          
+          # Construir la versión estática
+          npm run build:static
       
       - name: Setup Pages
         uses: actions/configure-pages@v4
@@ -57,7 +52,7 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: './build/client'
+          path: './dist'
 
   deploy:
     environment:
