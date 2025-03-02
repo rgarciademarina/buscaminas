@@ -33,6 +33,24 @@ jobs:
       - name: Build
         run: npm run build
       
+      - name: Create index.html
+        run: |
+          cat > build/client/index.html << 'EOL'
+          <!DOCTYPE html>
+          <html lang="es">
+          <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>Buscaminas</title>
+            <link rel="stylesheet" href="./assets/root-7xEKjomX.css">
+            <script type="module" src="./assets/entry.client-DMDbIu5M.js"></script>
+          </head>
+          <body>
+            <div id="root"></div>
+          </body>
+          </html>
+          EOL
+      
       - name: Setup Pages
         uses: actions/configure-pages@v4
       
